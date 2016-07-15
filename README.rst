@@ -17,7 +17,7 @@ Initialize a Tracer
 
 You can use any implementation of an OpenTracing tracer. In your application file, in the run method, instantiate an instance of this tracer wrapped with the DropWizardTracer.
 
-.. code-block: java
+.. code-block:: java
 
     @Override
     public void run(HelloWorldConfiguration configuration, Environment environment) {
@@ -29,7 +29,7 @@ Trace All Requests
 
 You can trace all requests to your application by registering `ServerRequestTracingFilter` and `ServerResponseTracingFilter` to jersey, as shown below.
 
-.. code-block: java
+.. code-block:: java
 
     import io.opentracing.dropwizard.ServerRequestTracingFilter;
     import io.opentracing.dropwizard.ServerResponseTracingFilter;
@@ -51,7 +51,7 @@ If you want to instead choose the requests to trace rather than tracing every re
 
 Your application should have the following lines of code to trace specific requests:
 
-.. code-block: java
+.. code-block:: java
     
     import io.opentracing.dropwizard.ServerRequestTracingFilter;
     import io.opentracing.dropwizard.ServerResponseTracingFilter;
@@ -67,7 +67,7 @@ Your application should have the following lines of code to trace specific reque
 
 To trace a whole resource, add the following annotation to the resource:
 
-.. code-block: java
+.. code-block:: java
     
     import io.opentracing.dropwizard.Trace;
 
@@ -97,7 +97,7 @@ To trace a whole resource, add the following annotation to the resource:
 
 However, to trace only certain subresources in the resource, add annotations to only those subresource methods. For example, to only trace `receiveSomething`, add the following annotation:
 
-.. code-block: javas
+.. code-block:: java
     
     import io.opentracing.dropwizard.Trace;
 
@@ -132,7 +132,7 @@ Sometimes you may want log, tag, or create a child span from the current span, w
 
 One way that you can access the request state is by using injection to reset the request whenever the resource is called. To do so, add the following lines of code to your resource:
 
-.. code-block: java
+.. code-block:: java
 
     @Context
     private Request request = null;
