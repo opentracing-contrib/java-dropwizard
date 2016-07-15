@@ -1,0 +1,53 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.opentracing.dropwizard</groupId>
+    <artifactId>dropwizard-opentracing</artifactId>
+    <version>0.1.0</version>
+
+    <properties>
+        <dropwizard.version>0.9.3</dropwizard.version>
+    </properties>
+    
+    <!-- Repos to add: opentracing (oss/bintray?), wherever lightstep is -->
+    <repositories>
+        <repository>
+            <id>maven2repo</id>
+            <name>Maven 2 Repository</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+<!--         <repository>
+            <id></id>
+            <name></name>
+            <url></url>
+        </repository> -->
+    </repositories>
+
+    <!-- Dependencies: opentracing, lightstep (for example), dropwizard (and javax? or is that part of dropwizard) -->
+    <dependencies>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-core</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+
+            <dependency>
+                <groupId>io.opentracing</groupId>
+                <artifactId>opentracing-api</artifactId>
+                <version>0.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lightstep.yolo.jre</groupId>
+                <artifactId>lightstep-tracer-jre</artifactId>
+                <version>0.1.25</version>
+                <scope>system</scope>
+                <systemPath>${project.basedir}/lib/lightstep-tracer-jre-0.1.25.jar</systemPath>
+            </dependency>
+            <dependency>
+                <groupId>com.lightstep.tracer.jre</groupId>
+                <artifactId>lightstep-tracer-jre</artifactId>
+                <version>0.1.25</version>
+                <scope>runtime</scope>
+            </dependency>
+    </dependencies>
+</project>
+
