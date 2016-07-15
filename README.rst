@@ -65,7 +65,7 @@ Your application should have the following lines of code to trace specific reque
         environment.jersey().register(new ServerTracingFeature(tracer));
     }   
 
-To trace a whole resource, add the following annotation to the resource:
+To trace a resource, add the following annotation to each method of the resource that you wish to trace:
 
 .. code-block:: java
     
@@ -73,10 +73,10 @@ To trace a whole resource, add the following annotation to the resource:
 
     @PATH('/some-path')
     @Produces(someType)
-    @Trace // traces all requests to this resource
     public class SomeResource {
 
         @GET
+        @Trace
         public String basePath() {
             // do some stuff
             return someString
@@ -90,45 +90,18 @@ To trace a whole resource, add the following annotation to the resource:
         }
 
         @POST
+        @Trace
         public void receiveSomething() {
             // do some other stuff
         }
     }
 
-However, to trace only certain subresources in the resource, add annotations to only those subresource methods. For example, to only trace `receiveSomething`, add the following annotation:
-
-.. code-block:: java
-    
-    import io.opentracing.dropwizard.Trace;
-
-    @PATH('/some-path')
-    @Produces(someType)
-    public class SomeResource {
-
-        @GET
-        public String basePath() {
-            // do some stuff
-            return someString
-        }
-
-        @GET 
-        @Path('some-sub-path')
-        public String subPath() {
-            // do some stuff
-            return someString
-        }
-
-        @POST
-        @Trace // traces only post requests 
-        public void receiveSomething() {
-            // do some other stuff
-        }
-    }
+In this example, GET and POST requests to '/some-path' will be traced, but GET requests to '/some-path/some-sub-path' will not.
 
 Accessing the Current Span
 **************************
 
-Sometimes you may want log, tag, or create a child span from the current span, which means that you need to be able to access the span. In order to do this, you can call `tracer.getSpan(request)` using the current request state. 
+Sometimes you may want log, tag, or create a child span from the current span, which means that you need to be able to access the span. In order to do this, you can call `tracer.getSpan(request)` using the current request state. In order to perform OpenTracing Tracer operations, such as buildSpan(), you can call tracer.getTracer(), which will return the DropWizardTracer's underlying io.opentracing.Tracer.
 
 One way that you can access the request state is by using injection to reset the request whenever the resource is called. To do so, add the following lines of code to your resource:
 
@@ -136,3 +109,29 @@ One way that you can access the request state is by using injection to reset the
 
     @Context
     private Request request = null;
+
+And to perform operations on the current span:
+
+.. code-block:: java
+
+    @GET
+    @Path('/some-request')
+    public void someResourceFunc(){
+        // get the span
+        span = tracer.getSpan(request);
+
+        // log something
+        span.log("event", payload);
+
+        // set a tag
+        span.set_tag("tag", payload);
+
+        // create a child span
+        Span childSpan = tracer.getTracer()
+            .buildSpan("some operation name")
+            .withParent(span)
+            .start();
+
+        // remember to finish any spans that you manually create
+        childSpan.finish();
+    }

@@ -1,4 +1,4 @@
-package com.example.helloworld.filter;
+package io.opentracing.dropwizard;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;

@@ -43,7 +43,7 @@
                 <systemPath>${project.basedir}/lib/lightstep-tracer-jre-0.1.25.jar</systemPath>
             </dependency>
             <dependency>
-                <groupId>com.lightstep.tracer.jre</groupId>
+                <groupId>com.lightstep.tracer</groupId>
                 <artifactId>lightstep-tracer-jre</artifactId>
                 <version>0.1.25</version>
                 <scope>runtime</scope>
