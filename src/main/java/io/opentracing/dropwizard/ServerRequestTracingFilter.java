@@ -33,6 +33,6 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         }
 
         // add the new span to the trace
-        tracer.addSpan(requestContext.getRequest(), span);
+        tracer.addServerSpan(requestContext.getRequest(), span);
     }
 }

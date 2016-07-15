@@ -118,7 +118,7 @@ And to perform operations on the current span:
     @Path('/some-request')
     public void someResourceFunc(){
         // get the span
-        span = tracer.getSpan(request);
+        Span span = tracer.getSpan(request);
 
         // log something
         span.log("event", payload);

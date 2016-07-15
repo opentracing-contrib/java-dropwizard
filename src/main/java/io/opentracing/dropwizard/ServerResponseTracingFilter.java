@@ -18,6 +18,6 @@ public class ServerResponseTracingFilter implements ContainerResponseFilter {
     
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        tracer.finishSpan(requestContext.getRequest());
+        tracer.finishServerSpan(requestContext.getRequest());
     }
 }
