@@ -21,7 +21,7 @@ You can use any implementation of an OpenTracing tracer. In your application fil
 
     @Override
     public void run(HelloWorldConfiguration configuration, Environment environment) {
-        final DropWizardTracer tracer = new DropWizardTracer(new JRETracer(new Options("{your_lightstep_token}")));
+        final DropWizardTracer tracer = new DropWizardTracer(someOpenTracingTracer);
     }
 
 Trace All Requests
