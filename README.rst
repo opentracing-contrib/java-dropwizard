@@ -65,7 +65,7 @@ Your application should have the following lines of code to trace specific reque
         environment.jersey().register(new ServerTracingFeature(tracer));
     }   
 
-To trace a resource, add the following annotation to each method of the resource that you wish to trace:
+To trace a resource, add the annotation @Trace to each method of the resource that you wish to trace:
 
 .. code-block:: java
     
