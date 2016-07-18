@@ -34,13 +34,18 @@ public class DropWizardTracer {
 
     /**
      * @param request for which we want to find the associated span 
-     * @return the span for this request, if it exists and is not 
+     * @return the span for this server request, if it exists and isn't 
      *  finished. Otherwise returns null.
      */
     public Span getSpan(Request request) {
         return this.serverSpans.get(request);
     }
 
+    /**
+     * @param request context for which we want to find the associated span
+     * @return the span for this client request, if it exists and is 
+     *  not finished. Otherwise returns null.
+     */
     public Span getSpan(ClientRequestContext requestCtx) {
         return this.clientSpans.get(requestCtx);
     }
@@ -50,7 +55,7 @@ public class DropWizardTracer {
     }
 
     protected void addClientSpan(ClientRequestContext requestCtx, Span span) {
-        this.clientSpans.get(requestCtx);
+        this.clientSpans.put(requestCtx, span);
     }
 
     protected void finishServerSpan(Request request) {
@@ -73,7 +78,7 @@ public class DropWizardTracer {
         return this.serverSpans;
     }
 
-    protected Map<ClientRequestContext, Span> getClientSpan() {
+    protected Map<ClientRequestContext, Span> getClientSpans() {
         return this.clientSpans;
     }
 }

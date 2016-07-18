@@ -24,8 +24,8 @@ You can use any implementation of an OpenTracing tracer. In your application fil
         final DropWizardTracer tracer = new DropWizardTracer(someOpenTracingTracer);
     }
 
-Trace All Requests
-******************
+Trace All Requests to Server
+****************************
 
 You can trace all requests to your application by registering `ServerRequestTracingFilter` and `ServerResponseTracingFilter` to jersey, as shown below.
 
@@ -44,8 +44,8 @@ You can trace all requests to your application by registering `ServerRequestTrac
         environment.jersey().register(new ServerResponseTracingFilter(tracer));
     }
 
-Trace Specific Requests
-***********************
+Trace Specific Requests to Server
+*********************************
 
 If you want to instead choose the requests to trace rather than tracing every request, then you can use the `@Trace` annotation along with our `ServerTracingFeature`, which dynamically adds server tracing filters to annotated resource classes.
 
@@ -98,6 +98,32 @@ To trace a resource, add the annotation @Trace to each method of the resource th
 
 In this example, GET and POST requests to '/some-path' will be traced, but GET requests to '/some-path/some-sub-path' will not.
 
+Trace Client Requests
+*********************
+
+If you want to trace outbound requests using Jersey clients, we provide ClientRequestTracingFilter and ClientResponseTracingFilter to do this. You can either register these filters on the client itself, or for specific WebTargets (see the `Jersey Client`_ documentation for more detailed instructions on registering client filters).
+
+.. _Jersey Client: https://jersey.java.net/nonav/documentation/latest/user-guide.html#client
+
+You must register both filters (for this example, we'll register them to the client) as follows:
+
+.. code-block:: java
+
+    @GET
+    @Path("/make-request")
+    @Trace
+    public String someSubresource() {
+        Client client = ClientBuilder.newClient()
+            .register(new ClientRequestTracingFilter(tracer).withContinuedTrace(request))
+            .register(new ClientResponseTracingFilter(tracer));
+        WebTarget webtarget = client.target("http://target-site.com/some/request/path");
+        Invocation.Builder invocationBuilder = webtarget.request();
+        Response response = invocationBuilder.get();
+        return formatOutput(response);
+    }
+
+The `ClientRequestTracingFilter` can be configured with `withContinuedTrace(request)` in order to link this client's spans with the current span. In this example, since someSubresource is annotated with `@Trace`, the filter must be configured to continue the current trace; otherwise, all client requests will start new traces. 
+
 Accessing the Current Span
 **************************
 
@@ -135,3 +161,27 @@ And to perform operations on the current span:
         // remember to finish any spans that you manually create
         childSpan.finish();
     }
+
+Note on Passing Tracers and Contexts
+************************************
+
+It's up to you to decide how you want to pass your tracer to the filters, but one method you might choose is to explicitly add the tracer to the constructor parameter for your resource class, and set it as a property of the resource. When you create your resources in your application's `run()` method, you'll initialize them with the tracer. **Note:** You'll only need to do this if you want to access the current span, or create a client with tracing filters.
+
+For these purposes, you'll also often have to access the current request context. One way to do this is by using Jersey `injection`_ and the @Context annotation. There are several ways to do this, including the methods shown below:
+
+.. code-block:: java
+    
+    @Path('/some-path')
+    public class SomeResource() {
+
+        // when this resource is initialized, request will be injected with the current request
+        @Context
+        private Request request = null
+
+        // if you only need the current request in one subresource, you can pass it in directly
+        public void someSubresource(@Context Request request) {
+            ...
+        }
+    }
+
+.. _injection: https://jersey.java.net/nonav/documentation/latest/user-guide.html#d0e2681
