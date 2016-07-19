@@ -13,9 +13,9 @@ Useage
 ======
 
 Initialize a Tracer
-*******************
+-------------------
 
-You can use any implementation of an OpenTracing tracer. In your application file, in the run method, instantiate an instance of this tracer wrapped with the DropWizardTracer.
+You can use any implementation of an OpenTracing tracer. In your application file, in the run method, instantiate an instance of this tracer wrapped with the DropWizardTracer. You can pass this tracer to resources and around your application either by explicitly passing them in the resource constructor, or using your own implementation of a global context.
 
 .. code-block:: java
 
@@ -24,46 +24,35 @@ You can use any implementation of an OpenTracing tracer. In your application fil
         final DropWizardTracer tracer = new DropWizardTracer(someOpenTracingTracer);
     }
 
-Trace All Requests to Server
-****************************
+Trace Requests to Server
+------------------------
 
-You can trace all requests to your application by registering `ServerRequestTracingFilter` and `ServerResponseTracingFilter` to jersey, as shown below.
+You can trace all requests to your application by registering `ServerTracingFeature` to jersey. This feature uses the builder pattern, which enables you to integrate tracing with a variety of options as follows:
 
 .. code-block:: java
 
-    import io.opentracing.dropwizard.ServerRequestTracingFilter;
-    import io.opentracing.dropwizard.ServerResponseTracingFilter;
+    import io.opentracing.dropwizard.ServerTracingFeature;
     import io.opentracing.dropwizard.DropWizardTracer;
 
     @Override
     public void run(HelloWorldConfiguration configuration, Environment environment) {
         final DropWizardTracer tracer = new DropWizardTracer(someOpenTracingTracer);    
         
-        // register the tracing filters
-        environment.jersey().register(new ServerRequestTracingFilter(tracer));
-        environment.jersey().register(new ServerResponseTracingFilter(tracer));
+        // registers filters for tracing
+        environment.jersey().register(new ServerTracingFeature
+            .Builder(tracer)
+            .withTraceAnnotations()
+            .withTracedAttributes(someSetOfAttributes)
+            .withTracedProperties(someSetOfPropertyNames)
+            .build());
     }
 
-Trace Specific Requests to Server
-*********************************
+- `withTraceAnnotations` turns on tracing annotations. By default, all requests to your application are traced. However, if tracing annotations are enabled, then only resource methods annotated with @Trace will be traced.
+- `withTracedAttributes` allows you to specify attributes of the request that you wish to be logged or tagged to your spans. It takes in a `Set<ServerAttribute>`, and all attributes available for tracing are enumerated in `io.opentracing.contrib.dropwizard.ServerAttribute`.
+- `withTracedProperties` allows you to trace custom properties of the request. It takes in a `Set<String>` with the names of the properties you wish to trace, and sets tags on the span.
 
-If you want to instead choose the requests to trace rather than tracing every request, then you can use the `@Trace` annotation along with our `ServerTracingFeature`, which dynamically adds server tracing filters to annotated resource classes.
-
-Your application should have the following lines of code to trace specific requests:
-
-.. code-block:: java
-    
-    import io.opentracing.dropwizard.ServerRequestTracingFilter;
-    import io.opentracing.dropwizard.ServerResponseTracingFilter;
-    import io.opentracing.dropwizard.DropWizardTracer;
-
-    @Override
-    public void run(HelloWorldConfiguration configuration, Environment environment) {
-        final DropWizardTracer tracer = new DropWizardTracer(someOpenTracingTracer);    
-        
-        // register the dynamic feature that traces resources annotated with @Trace
-        environment.jersey().register(new ServerTracingFeature(tracer));
-    }   
+Using @Trace Annotations
+~~~~~~~~~~~~~~~~~~~~~~~~  
 
 To trace a resource, add the annotation @Trace to each method of the resource that you wish to trace:
 
@@ -99,30 +88,30 @@ To trace a resource, add the annotation @Trace to each method of the resource th
 In this example, GET and POST requests to '/some-path' will be traced, but GET requests to '/some-path/some-sub-path' will not.
 
 Trace Client Requests
-*********************
+---------------------
 
-If you want to trace outbound requests using Jersey clients, we provide ClientRequestTracingFilter and ClientResponseTracingFilter to do this. You can either register these filters on the client itself, or for specific WebTargets (see the `Jersey Client`_ documentation for more detailed instructions on registering client filters).
-
-.. _Jersey Client: https://jersey.java.net/nonav/documentation/latest/user-guide.html#client
-
-You must register both filters (for this example, we'll register them to the client) as follows:
+If you want to trace outbound requests using Jersey clients, we provide a `ClientTracingFeature` class. This feature also follows the builder pattern. See below for example useage.
 
 .. code-block:: java
 
     @GET
-    @Path("/make-request")
+    @Path("/some-path")
     @Trace
     public String someSubresource() {
-        Client client = ClientBuilder.newClient()
-            .register(new ClientRequestTracingFilter(tracer).withContinuedTrace(request))
-            .register(new ClientResponseTracingFilter(tracer));
-        WebTarget webtarget = client.target("http://target-site.com/some/request/path");
-        Invocation.Builder invocationBuilder = webtarget.request();
+        WebTarget webTarget = client.target("http://localhost:8080/hello-world/");
+        ClientTracingFeature feature = new ClientTracingFeature
+            .Builder(tracer)
+            .withRequest(request)
+            .withTracedAttributes(new HashSet<ClientAttribute>(Arrays.asList(ClientAttribute.URI, ClientAttribute.LANGUAGE)))
+            .withTracedProperties(new HashSet<String>(Arrays.asList("custom_tag")))
+            .build();
+        feature.registerTo(webTarget);
+        Invocation.Builder invocationBuilder = webTarget.request();
         Response response = invocationBuilder.get();
-        return formatOutput(response);
+        return "Result: " + response;
     }
 
-The `ClientRequestTracingFilter` can be configured with `withContinuedTrace(request)` in order to link this client's spans with the current span. In this example, since someSubresource is annotated with `@Trace`, the filter must be configured to continue the current trace; otherwise, all client requests will start new traces. 
+The `ClientRequestTracingFilter` can be configured with `withRequest(request)` in order to link this client's spans with the current span. In this example, since someSubresource is annotated with `@Trace`, the filter must be configured to continue the current trace; otherwise, all client requests will start new traces. 
 
 Accessing the Current Span
 **************************
@@ -162,12 +151,10 @@ And to perform operations on the current span:
         childSpan.finish();
     }
 
-Note on Passing Tracers and Contexts
-************************************
+Note on Contexts
+****************
 
-It's up to you to decide how you want to pass your tracer to the filters, but one method you might choose is to explicitly add the tracer to the constructor parameter for your resource class, and set it as a property of the resource. When you create your resources in your application's `run()` method, you'll initialize them with the tracer. **Note:** You'll only need to do this if you want to access the current span, or create a client with tracing filters.
-
-For these purposes, you'll also often have to access the current request context. One way to do this is by using Jersey `injection`_ and the @Context annotation. There are several ways to do this, including the methods shown below:
+Just like it's up to you to decide how you want to pass your tracer to the filters, you also are responsible for accessing the current request. One way to do this is by using Jersey `injection`_ and the @Context annotation. There are several ways to do this, including the methods shown below:
 
 .. code-block:: java
     
@@ -183,5 +170,7 @@ For these purposes, you'll also often have to access the current request context
             ...
         }
     }
+
+**Note:** You'll only need to do this if you want to access the current span, or build a ClientTracingFeature that can continue the current trace (instead of starting a new one).
 
 .. _injection: https://jersey.java.net/nonav/documentation/latest/user-guide.html#d0e2681

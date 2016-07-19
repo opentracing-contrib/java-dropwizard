@@ -1,4 +1,4 @@
-package io.opentracing.dropwizard;
+package io.opentracing.contrib.dropwizard;
 
 import io.opentracing.Span;
 
