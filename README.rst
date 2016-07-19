@@ -1,6 +1,6 @@
-######################
+======================
 DropWizard-Opentracing
-######################
+======================
 
 This module provides functionality for tracing requests in DropWizard using the OpenTracing API. 
 
@@ -114,7 +114,7 @@ If you want to trace outbound requests using Jersey clients, we provide a `Clien
 The `ClientRequestTracingFilter` can be configured with `withRequest(request)` in order to link this client's spans with the current span. In this example, since someSubresource is annotated with `@Trace`, the filter must be configured to continue the current trace; otherwise, all client requests will start new traces. 
 
 Accessing the Current Span
-**************************
+--------------------------
 
 Sometimes you may want log, tag, or create a child span from the current span, which means that you need to be able to access the span. In order to do this, you can call `tracer.getSpan(request)` using the current request state. In order to perform OpenTracing Tracer operations, such as buildSpan(), you can call tracer.getTracer(), which will return the DropWizardTracer's underlying io.opentracing.Tracer.
 
@@ -152,7 +152,7 @@ And to perform operations on the current span:
     }
 
 Note on Contexts
-****************
+----------------
 
 Just like it's up to you to decide how you want to pass your tracer to the filters, you also are responsible for accessing the current request. One way to do this is by using Jersey `injection`_ and the @Context annotation. There are several ways to do this, including the methods shown below:
 
