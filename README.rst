@@ -60,6 +60,8 @@ Using @Trace Annotations
 
 To trace a resource, add the annotation @Trace to each method of the resource that you wish to trace. If you wish to set the operation name for a specific resource method (the default is the name of the resource class) then you can add a paramater to @Trace(operationName="New Operation Name"). See the `opentracing documentation`_ for more information about choosing operation names.
 
+**Note:** The @Trace annotations can be used to set a resource method's operation name even when the ServerTracingFeature is configured without withTraceAnnotations. 
+
 .. code-block:: java
     
     import io.opentracing.dropwizard.Trace;
@@ -76,7 +78,7 @@ To trace a resource, add the annotation @Trace to each method of the resource th
         }
         
         @POST
-        @Trace(operationName="Some Custom Operation Name")
+        @Trace(operationName="custom_operation_name")
         public void receiveSomething() {
             // do some other stuff
         }
@@ -89,7 +91,7 @@ To trace a resource, add the annotation @Trace to each method of the resource th
         }
     }
 
-In this example, GET and POST requests to '/some-path' will be traced, but GET requests to '/some-path/some-sub-path' will not. The operation name of the span created for the GET request is "SomeResource", while for the POST request is "Some Custom Operation Name".
+In this example, GET and POST requests to '/some-path' will be traced, but GET requests to '/some-path/some-sub-path' will not. The operation name of the span created for the GET request is "SomeResource", while for the POST request is "custom_operation_name".
 
 Trace Client Requests
 =====================
@@ -102,7 +104,7 @@ If you want to trace outbound requests using Jersey clients, we provide a `Clien
     @Path("/some-path")
     @Trace
     public String someSubresource() {
-        WebTarget webTarget = client.target("http://some-url.com/some/request/path);
+        WebTarget webTarget = client.target("http://some-url.com/some/request/path");
 
         ClientTracingFeature feature = new ClientTracingFeature
             .Builder(tracer)
