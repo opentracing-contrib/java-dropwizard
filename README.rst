@@ -167,7 +167,7 @@ And to perform operations on the current span:
 Requests and Contexts
 =====================
 
-Just like it's up to you to decide how to pass your tracer to the filters, you also are responsible for accessing the current request. (**Note:** You'll only need to do this if you want to access the current span, or build a ClientTracingFeature that can continue the current trace.) One way to do this is by using `Jersey injection`_ and the @Context annotation. There are several ways to do this, including the methods shown below:
+Just like it's up to you to decide how to pass your tracer to the filters, you also are responsible for accessing the current request.  One way to do this is by using `Jersey injection`_ and the @Context annotation. There are several ways to do this, including the methods shown below:
 
 .. code-block:: java
     
@@ -183,6 +183,8 @@ Just like it's up to you to decide how to pass your tracer to the filters, you a
             ...
         }
     }
+
+**Note:** You'll only need to do this if you want to access the current span, or build a ClientTracingFeature that can continue the current trace.
 
 .. _Jersey injection: https://jersey.java.net/nonav/documentation/latest/user-guide.html#d0e2681
 .. _opentracing documentation: http://opentracing.io/spec/#operation-names

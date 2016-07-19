@@ -9,6 +9,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.client.ClientRequestContext;
 
+/**
+ * 
+ *
+ */
 public class DropWizardTracer {
 
     private Tracer tracer;
@@ -50,15 +54,15 @@ public class DropWizardTracer {
         return this.clientSpans.get(requestCtx);
     }
 
-    public void addServerSpan(Request request, Span span) {
+    protected void addServerSpan(Request request, Span span) {
         this.serverSpans.put(request, span);
     }
 
-    public void addClientSpan(ClientRequestContext requestCtx, Span span) {
+    protected void addClientSpan(ClientRequestContext requestCtx, Span span) {
         this.clientSpans.put(requestCtx, span);
     }
 
-    public void finishServerSpan(Request request) {
+    protected void finishServerSpan(Request request) {
         Span span = this.serverSpans.get(request);
         if(span != null) {
             this.serverSpans.remove(request);
@@ -66,7 +70,7 @@ public class DropWizardTracer {
         }
     }
 
-    public void finishClientSpan(ClientRequestContext requestCtx) {
+    protected void finishClientSpan(ClientRequestContext requestCtx) {
         Span span = this.clientSpans.get(requestCtx);
         if(span != null) {
             this.clientSpans.remove(requestCtx);

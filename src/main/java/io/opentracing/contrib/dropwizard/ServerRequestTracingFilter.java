@@ -1,11 +1,11 @@
-package io.opentracing.contrib.dropwizard.server;
+package io.opentracing.contrib.dropwizard;
 
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.TextMapReader;
 
 import io.opentracing.contrib.dropwizard.DropWizardTracer;
-import io.opentracing.contrib.dropwizard.server.ServerAttribute;
+import io.opentracing.contrib.dropwizard.ServerAttribute;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,7 +16,10 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.MultivaluedMap;
 
-
+/**
+ * When registered to a DropWizard service along with a ServerResponseTracingFilter,
+ * this filter creates a span for any requests to the service.
+ */
 public class ServerRequestTracingFilter implements ContainerRequestFilter {
 
     private final DropWizardTracer tracer;
@@ -24,6 +27,12 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     private final Set<String> tracedProperties;
     private String operationName;
 
+    /**
+     * @param tracer to trace requests with
+     * @param operationName for any spans created by this filter
+     * @param tracedAttributes any ServiceAttributes to log to spans
+     * @param tracedProperties any request properties to log to spans
+     */
     public ServerRequestTracingFilter(
         DropWizardTracer tracer,
         String operationName,

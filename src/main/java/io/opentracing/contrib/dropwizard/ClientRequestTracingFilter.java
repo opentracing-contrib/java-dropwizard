@@ -1,9 +1,9 @@
-package io.opentracing.contrib.dropwizard.client;
+package io.opentracing.contrib.dropwizard;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.TextMapWriter;
-import io.opentracing.contrib.dropwizard.client.ClientAttribute;
+import io.opentracing.contrib.dropwizard.ClientAttribute;
 import io.opentracing.contrib.dropwizard.DropWizardTracer;
 
 import java.io.IOException;
@@ -17,6 +17,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 
+/**
+ * When registered to a client or webtarget along with a ClientResponseTracingFilter,
+ * this filter creates a span for the client request when it is made.
+ */
 public class ClientRequestTracingFilter implements ClientRequestFilter {
 
     private final Request request;
@@ -25,6 +29,14 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
     private final Set<String> tracedProperties;
     private String operationName;
 
+    /**
+     * @param tracer to trace requests with
+     * @param request the current request to be a parent span
+     *      for any client spans created (null if none)
+     * @param operationName for any spans created by this filter
+     * @param tracedAttributes any ClientAttributes to log to the span
+     * @param tracedProperties any request properties to log to the span
+     */
     public ClientRequestTracingFilter(
         DropWizardTracer tracer, 
         Request request, 

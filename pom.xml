@@ -3,11 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.opentracing.dropwizard</groupId>
+    <groupId>io.opentracing.contrib.dropwizard</groupId>
     <artifactId>dropwizard-opentracing</artifactId>
     <version>0.1.0</version>
-    <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Support for integrating OpenTracing in DropWizard projects</description>
     <url>http://github.com/kcamenzind/dropwizard-opentracing</url>
+
+    <packaging>jar</packaging>
 
     <properties>
         <dropwizard.version>0.9.3</dropwizard.version>
@@ -23,18 +27,20 @@
     <repositories>
         <repository>
             <id>bintray</id>
-            <name>Bintray Repo</name>
-            <url>http://oss.jfrog.org/oss-snapshot-local/</url>
-        </repository>
-        <!-- this repo below is different from the one that
-            the README says to use (which is the one above) 
-            but the other one doesn't work -->
-        <repository>
-            <id>bintrayAgan</id>
-            <name>Bintray for Lightstep</name>
+            <name>Bintray</name>
             <url>https://dl.bintray.com/lightstep/maven/</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-kcamenzind-dropwizard-opentracing</id>
+            <name>kcamenzind-dropwizard-opentracing</name>
+            <url>
+                https://api.bintray.com/maven/kcamenzind/dropwizard-opentracing/io.opentracing.contrib.dropwizard/;publish=1
+            </url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -54,6 +60,65 @@
             <type>pom</type>
         </dependency>
     </dependencies>
+
+    <!-- <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build> -->
 
 </project>
 

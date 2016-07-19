@@ -1,5 +1,8 @@
-package io.opentracing.contrib.dropwizard.server;
+package io.opentracing.contrib.dropwizard;
 
+/*
+ * Attributes that can be traced for Server Requests
+ */
 public enum ServerAttribute {
     ACCEPTABLE_LANGUAGES,
     ACCEPTABLE_MEDIA_TYPES,

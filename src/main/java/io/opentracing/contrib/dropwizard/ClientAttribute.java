@@ -1,5 +1,8 @@
-package io.opentracing.contrib.dropwizard.client;
+package io.opentracing.contrib.dropwizard;
 
+/*
+ * Attributes that can be traced for Client Requests
+ */
 public enum ClientAttribute {     
     ACCEPTABLE_LANGUAGES,
     ACCEPTABLE_MEDIA_TYPES,
