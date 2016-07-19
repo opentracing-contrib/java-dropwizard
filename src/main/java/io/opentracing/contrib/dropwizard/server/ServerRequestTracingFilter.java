@@ -1,10 +1,11 @@
-package io.opentracing.contrib.dropwizard;
+package io.opentracing.contrib.dropwizard.server;
 
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.TextMapReader;
 
-import io.opentracing.contrib.dropwizard.ServerAttribute;
+import io.opentracing.contrib.dropwizard.DropWizardTracer;
+import io.opentracing.contrib.dropwizard.server.ServerAttribute;
 
 import java.io.IOException;
 import java.util.Map;
@@ -21,13 +22,16 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     private final DropWizardTracer tracer;
     private final Set<ServerAttribute> tracedAttributes;
     private final Set<String> tracedProperties;
+    private String operationName;
 
     public ServerRequestTracingFilter(
         DropWizardTracer tracer,
+        String operationName,
         Set<ServerAttribute> tracedAttributes, 
         Set<String> tracedProperties
     ) {
         this.tracer = tracer;
+        this.operationName = operationName;
         this.tracedProperties = tracedProperties;
         this.tracedAttributes = tracedAttributes;
     }
@@ -35,9 +39,10 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         // set the operation name
-        String operationName = "";
-        for(Object resource : requestContext.getUriInfo().getMatchedResources()) {
-            operationName += resource.getClass().getSimpleName() + " ";
+        if(this.operationName.equals("")) {
+            for(Object resource : requestContext.getUriInfo().getMatchedResources()) {
+                this.operationName += resource.getClass().getSimpleName() + " ";
+            }
         }
 
         // format the headers for extraction
@@ -56,16 +61,15 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
                 }
             });
             if(parentSpan == null){
-                span = tracer.getTracer().buildSpan(operationName).start();
+                span = tracer.getTracer().buildSpan(this.operationName).start();
             } else {
-                span = tracer.getTracer().buildSpan(operationName).asChildOf(parentSpan).start();
+                span = tracer.getTracer().buildSpan(this.operationName).asChildOf(parentSpan).start();
             }
         } catch(IllegalArgumentException e) {
-            span = tracer.getTracer().buildSpan(operationName).start();
+            span = tracer.getTracer().buildSpan(this.operationName).start();
         }
 
         // trace attributes
-
         for(ServerAttribute attribute : this.tracedAttributes) {
             switch(attribute) {
                 case ACCEPTABLE_LANGUAGES: 
@@ -124,7 +128,6 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         }
 
         // trace properties
-
         for(String propertyName : this.tracedProperties) {
             Object property = requestContext.getProperty(propertyName);
             if(property != null) {

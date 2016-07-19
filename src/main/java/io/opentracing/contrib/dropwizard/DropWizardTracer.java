@@ -50,15 +50,15 @@ public class DropWizardTracer {
         return this.clientSpans.get(requestCtx);
     }
 
-    protected void addServerSpan(Request request, Span span) {
+    public void addServerSpan(Request request, Span span) {
         this.serverSpans.put(request, span);
     }
 
-    protected void addClientSpan(ClientRequestContext requestCtx, Span span) {
+    public void addClientSpan(ClientRequestContext requestCtx, Span span) {
         this.clientSpans.put(requestCtx, span);
     }
 
-    protected void finishServerSpan(Request request) {
+    public void finishServerSpan(Request request) {
         Span span = this.serverSpans.get(request);
         if(span != null) {
             this.serverSpans.remove(request);
@@ -66,19 +66,11 @@ public class DropWizardTracer {
         }
     }
 
-    protected void finishClientSpan(ClientRequestContext requestCtx) {
+    public void finishClientSpan(ClientRequestContext requestCtx) {
         Span span = this.clientSpans.get(requestCtx);
         if(span != null) {
             this.clientSpans.remove(requestCtx);
             span.finish();
         }
-    }
-
-    protected Map<Request,Span> getServerSpans() {
-        return this.serverSpans;
-    }
-
-    protected Map<ClientRequestContext, Span> getClientSpans() {
-        return this.clientSpans;
     }
 }

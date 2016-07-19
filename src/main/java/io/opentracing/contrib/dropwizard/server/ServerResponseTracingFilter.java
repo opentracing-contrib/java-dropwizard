@@ -1,5 +1,6 @@
-package io.opentracing.contrib.dropwizard;
+package io.opentracing.contrib.dropwizard.server;
 
+import io.opentracing.contrib.dropwizard.DropWizardTracer;
 import io.opentracing.Span;
 
 import java.io.IOException;

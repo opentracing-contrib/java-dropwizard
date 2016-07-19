@@ -1,9 +1,10 @@
-package io.opentracing.contrib.dropwizard;
+package io.opentracing.contrib.dropwizard.client;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.TextMapWriter;
-import io.opentracing.contrib.dropwizard.ClientAttribute;
+import io.opentracing.contrib.dropwizard.client.ClientAttribute;
+import io.opentracing.contrib.dropwizard.DropWizardTracer;
 
 import java.io.IOException;
 import javax.ws.rs.client.ClientRequestContext;
@@ -18,19 +19,22 @@ import java.util.Set;
 
 public class ClientRequestTracingFilter implements ClientRequestFilter {
 
-    private Request request;
-    private DropWizardTracer tracer;
-    private Set<ClientAttribute> tracedAttributes;
-    private Set<String> tracedProperties;
+    private final Request request;
+    private final DropWizardTracer tracer;
+    private final Set<ClientAttribute> tracedAttributes;
+    private final Set<String> tracedProperties;
+    private String operationName;
 
     public ClientRequestTracingFilter(
         DropWizardTracer tracer, 
         Request request, 
+        String operationName,
         Set<ClientAttribute> tracedAttributes, 
         Set<String> tracedProperties
     ) {
         this.tracer = tracer;
         this.request = request;
+        this.operationName = operationName;
         this.tracedAttributes = tracedAttributes;
         this.tracedProperties = tracedProperties;
     }
@@ -39,7 +43,9 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
     public void filter(ClientRequestContext requestContext) throws IOException {
         
         // set the operation name
-        String operationName = requestContext.getUri().toString();
+        if(this.operationName == ""){
+            this.operationName = "Client";
+        }
 
         // create the new span
         Span span = null;
@@ -55,7 +61,6 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
         }
 
         // trace attributes
-
        for(ClientAttribute attribute : this.tracedAttributes) {
             switch(attribute) {
                 case ACCEPTABLE_LANGUAGES: 
@@ -118,7 +123,6 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
         }
 
         // trace properties
-
         for(String propertyName : this.tracedProperties) {
             Object property = requestContext.getProperty(propertyName);
             if(property != null) {

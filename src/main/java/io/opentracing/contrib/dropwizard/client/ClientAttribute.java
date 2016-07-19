@@ -1,4 +1,4 @@
-package io.opentracing.contrib.dropwizard;
+package io.opentracing.contrib.dropwizard.client;
 
 public enum ClientAttribute {     
     ACCEPTABLE_LANGUAGES,

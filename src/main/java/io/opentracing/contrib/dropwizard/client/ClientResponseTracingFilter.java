@@ -1,6 +1,7 @@
-package io.opentracing.contrib.dropwizard;
+package io.opentracing.contrib.dropwizard.client;
 
 import io.opentracing.Span;
+import io.opentracing.contrib.dropwizard.DropWizardTracer;
 
 import java.io.IOException;
 import javax.ws.rs.client.ClientRequestContext;

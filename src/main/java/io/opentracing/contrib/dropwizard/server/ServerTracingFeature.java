@@ -1,4 +1,4 @@
-package io.opentracing.contrib.dropwizard;
+package io.opentracing.contrib.dropwizard.server;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,8 +8,8 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
 import io.opentracing.contrib.dropwizard.DropWizardTracer;
-import io.opentracing.contrib.dropwizard.ServerRequestTracingFilter;
-import io.opentracing.contrib.dropwizard.ServerResponseTracingFilter;
+import io.opentracing.contrib.dropwizard.server.ServerRequestTracingFilter;
+import io.opentracing.contrib.dropwizard.server.ServerResponseTracingFilter;
 import io.opentracing.contrib.dropwizard.Trace;
 
 @Provider
@@ -34,9 +34,19 @@ public class ServerTracingFeature implements DynamicFeature {
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
-        if (traceAll || resourceInfo.getResourceMethod().getAnnotation(Trace.class) != null) {
-            context.register(new ServerRequestTracingFilter(this.tracer, this.tracedAttributes, this.tracedProperties));
-            context.register(new ServerResponseTracingFilter(this.tracer));
+        Trace annotation = resourceInfo.getResourceMethod().getAnnotation(Trace.class);
+        String operationName = "";
+        if (annotation != null) {
+            operationName = annotation.operationName();
+            context.register(new ServerRequestTracingFilter(this.tracer, operationName,
+                this.tracedAttributes, this.tracedProperties));
+            context.register(new ServerResponseTracingFilter(this.tracer));  
+        } else {
+            if (traceAll) {
+                context.register(new ServerRequestTracingFilter(this.tracer, operationName,
+                    this.tracedAttributes, this.tracedProperties));
+                context.register(new ServerResponseTracingFilter(this.tracer));
+            } 
         }
     }
 
