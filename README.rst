@@ -8,7 +8,29 @@ This module provides functionality for tracing requests in DropWizard using the 
 Installation
 ************
 
-Artifacts can be found at...
+Artifacts are available on Maven Central, so you can add this dependency to your to your project as follows:
+
+Maven
+-----
+
+.. code_block:: 
+
+    <dependency>
+        <groupId>io.opentracing.contrib.dropwizard</groupId>
+        <artifactId>dropwizard-opentracing</artifactId>
+        <version>0.1.0</version>
+    </dependency>
+
+Gradle
+------
+
+.. code_block::
+
+    dependencies {
+        compile 'io.opentracing.contrib.dropwizard:dropwizard-opentracing:0.1.0'
+    }
+
+If you're using a different build tool, use their syntax.
 
 ******
 Useage 
