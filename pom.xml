@@ -23,6 +23,21 @@
             <url>http://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <name>Kathy Camenzind</name>
+            <email>kcamenzind@lightstep.com</email>
+            <organization>LightStep</organization>
+            <organizationUrl>http://www.lightstep.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/kcamenzind/dropwizard-opentracing.git</connection>
+        <developerConnection>scm:git:ssh://github.com:kcamenzind/dropwizard-opentracing.git</developerConnection>
+        <url>http://github.com/kcamenzind/dropwizard-opentracing/tree/master</url>
+    </scm>
     
     <repositories>
         <repository>
