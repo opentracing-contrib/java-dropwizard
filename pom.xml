@@ -34,19 +34,11 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/kcamenzind/dropwizard-opentracing.git</connection>
-        <developerConnection>scm:git:ssh://github.com:kcamenzind/dropwizard-opentracing.git</developerConnection>
-        <url>http://github.com/kcamenzind/dropwizard-opentracing/tree/master</url>
+        <connection>scm:git:git://github.com/opentracing-contrib/java-dropwizard.git</connection>
+        <developerConnection>scm:git:ssh://github.com:opentracing-contrib/java-dropwizard.git</developerConnection>
+        <url>http://github.com/opentracing-contrib/java-dropwizard/tree/master</url>
     </scm>
     
-    <repositories>
-        <repository>
-            <id>bintray</id>
-            <name>Bintray</name>
-            <url>https://dl.bintray.com/lightstep/maven/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -61,7 +53,7 @@
         <dependency>
             <groupId>com.lightstep.tracer</groupId>
             <artifactId>lightstep-tracer-jre</artifactId>
-            <version>0.8.1</version>
+            <version>0.8.22</version>
             <type>pom</type>
         </dependency>
     </dependencies>
