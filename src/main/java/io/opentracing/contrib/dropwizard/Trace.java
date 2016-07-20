@@ -9,10 +9,8 @@ import java.lang.annotation.Target;
  * Annotation to use on DropWizard resource methods 
  * that you wish to trace.
  *
- * If you pass in an operation name as follows:
- *
- *      @Trace(operationName="some_name")
- *
+ * If you pass in an operation name such as 
+ *      Trace(operationName="some_name")
  *  then all spans created for requests to the
  *  annotated resource method will have the 
  *  specified operationName

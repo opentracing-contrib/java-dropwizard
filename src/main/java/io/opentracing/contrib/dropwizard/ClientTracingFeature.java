@@ -47,7 +47,7 @@ public class ClientTracingFeature {
     }
 
     /**
-     * @param Client to register tracing filters to
+     * @param client Clientto register tracing filters to
      */
     public void registerTo(Client client) {
         client.register(new ClientRequestTracingFilter(this.tracer, this.request, 
@@ -56,7 +56,7 @@ public class ClientTracingFeature {
     }
 
     /**
-     * @param WebTarget to register tracing filters to
+     * @param target WebTarget to register tracing filters to
      */
     public void registerTo(WebTarget target) {
         target.register(new ClientRequestTracingFilter(this.tracer, this.request, 
@@ -90,6 +90,7 @@ public class ClientTracingFeature {
          * @param request to continue the trace from. This 
          *  is what allows you to link this client request to previous 
          *  requests, instead of creating an entirely new trace.
+         * @return Builder configured with added request
          */
         public Builder withRequest(Request request) {
             this.request = request;
@@ -97,8 +98,9 @@ public class ClientTracingFeature {
         }
 
         /**
-         * @param a set of ClientAttributes that you want to tag to spans
-         *  created for client requests
+         * @param tracedAttributes a set of request attributes that you want 
+         *  to tag to spans created for client requests
+         * @return Builder configured with added tracedAttributes
          */
         public Builder withTracedAttributes(Set<ClientAttribute> tracedAttributes) {
             this.tracedAttributes = tracedAttributes;
@@ -106,8 +108,9 @@ public class ClientTracingFeature {
         }
 
         /**
-         * @param a set of properties of the client request to tag 
+         * @param properties properties of the client request to tag 
          *  to spans created for client requests
+         * @return Builder configured with added traced properties
          */
         public Builder withTracedProperties(Set<String> properties) {
             this.tracedProperties = properties;
@@ -116,6 +119,7 @@ public class ClientTracingFeature {
 
         /**
          * @param operationName for spans created by this feature
+         * @return Builder configured with added operationName
          */
         public Builder withOperationName(String operationName) {
             this.operationName = operationName;

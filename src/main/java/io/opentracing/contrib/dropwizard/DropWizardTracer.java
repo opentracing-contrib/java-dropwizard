@@ -46,7 +46,7 @@ public class DropWizardTracer {
     }
 
     /**
-     * @param request context for which we want to find the associated span
+     * @param requestCtx context for which we want to find the associated span
      * @return the span for this client request, if it exists and is 
      *  not finished. Otherwise returns null.
      */

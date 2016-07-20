@@ -78,8 +78,9 @@ public class ServerTracingFeature implements DynamicFeature {
         }
 
         /**
-         * @param a set of ServerAttributes that you want to tag to spans
+         * @param tracedAttributes a set of ServerAttributes that you want to tag to spans
          *  created for requests to the server
+         * @return Builder configured with added traced attributes
          */
         public Builder withTracedAttributes(Set<ServerAttribute> tracedAttributes) {
             this.tracedAttributes = tracedAttributes;
@@ -87,11 +88,12 @@ public class ServerTracingFeature implements DynamicFeature {
         }
 
         /**
-         * @param a set of properties of the client request to tag 
+         * @param properties a set of request properties of the client request to tag 
          *  to spans created for client requests
+         * @return Builder configured with added traced properties
          */
-        public Builder withTracedProperties(Set<String> tracedProperties) {
-            this.tracedProperties = tracedProperties;
+        public Builder withTracedProperties(Set<String> properties) {
+            this.tracedProperties = properties;
             return this;
         }
 
@@ -99,6 +101,7 @@ public class ServerTracingFeature implements DynamicFeature {
          * By default, all requests to the server all traced. However, if you configure
          * your ServerTracingFeature with trace annotations, then only requests to resource
          * methods annotated with @Trace will be traced.
+         * @return Builder configured to use trace annotations
          */
         public Builder withTraceAnnotations() {
             this.traceAll = false;
