@@ -11,9 +11,8 @@ Installation
 Artifacts are available on Maven Central, so you can add this dependency to your to your project as follows:
 
 Maven
------
-
-.. code_block:: 
+=====
+.. code-block:: 
 
     <dependency>
         <groupId>io.opentracing.contrib.dropwizard</groupId>
@@ -22,9 +21,8 @@ Maven
     </dependency>
 
 Gradle
-------
-
-.. code_block::
+======
+.. code-block::
 
     dependencies {
         compile 'io.opentracing.contrib.dropwizard:dropwizard-opentracing:0.1.0'
@@ -210,4 +208,3 @@ Just like it's up to you to decide how to pass your tracer to the filters, you a
 
 .. _Jersey injection: https://jersey.java.net/nonav/documentation/latest/user-guide.html#d0e2681
 .. _opentracing documentation: http://opentracing.io/spec/#operation-names
-
