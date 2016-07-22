@@ -83,7 +83,7 @@ You can trace all requests to your application by registering `ServerTracingFeat
 
 - `withTracedProperties(Set<String>)` allows you to trace custom properties of the request. It takes in a set of property namesthat you wish to trace, and sets tags on the span.
 
-* If you're using a version of DropWizard older than 0.8, then the ServerTracingFeature is not supported. Instead, use the ServerRequestTracingFilter and ServerResponseTracingFilter as follows:
+**Note:** If you're using a version of DropWizard older than 0.8, then the ServerTracingFeature is not supported. Instead, use the ServerRequestTracingFilter and ServerResponseTracingFilter as follows:
 
 .. code-block:: java
 
