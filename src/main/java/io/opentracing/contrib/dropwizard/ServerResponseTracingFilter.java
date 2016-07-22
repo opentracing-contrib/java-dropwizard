@@ -20,6 +20,19 @@ public class ServerResponseTracingFilter implements ContainerResponseFilter {
     public ServerResponseTracingFilter(DropWizardTracer tracer) {
         this.tracer = tracer;
     }
+
+    public class Builder {
+
+        private DropWizardTracer tracer;
+
+        public Builder(DropWizardTracer tracer) {
+            this.tracer = tracer;
+        }
+
+        public ServerResponseTracingFilter build() {
+            return new ServerResponseTracingFilter(this.tracer);
+        }
+    }
     
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {

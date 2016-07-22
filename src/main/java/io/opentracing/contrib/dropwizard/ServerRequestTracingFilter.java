@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Iterator;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -43,6 +44,38 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         this.operationName = operationName;
         this.tracedProperties = tracedProperties;
         this.tracedAttributes = tracedAttributes;
+    }
+
+    public class Builder {
+
+        private final DropWizardTracer tracer;
+        private Set<ServerAttribute> tracedAttributes = new HashSet<ServerAttribute>();
+        private Set<String> tracedProperties = new HashSet<String>();
+        private String operationName = "";
+
+        public Builder(DropWizardTracer tracer) {
+            this.tracer = tracer;
+        }
+
+        public Builder withTracedAttributes(Set<ServerAttribute> attributes) {
+            this.tracedAttributes = attributes;
+            return this;
+        }
+
+        public Builder withTracedProperties(Set<String> properties) {
+            this.tracedProperties = properties;
+            return this;
+        }
+
+        public Builder withOperationName(String operationName) {
+            this.operationName = operationName;
+            return this;
+        }
+
+        public ServerRequestTracingFilter build() {
+            return new ServerRequestTracingFilter(this.tracer, this.operationName, 
+                this.tracedAttributes, this.tracedProperties);
+        }
     }
     
     @Override

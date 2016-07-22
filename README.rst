@@ -60,8 +60,8 @@ You can trace all requests to your application by registering `ServerTracingFeat
 
 .. code-block:: java
 
-    import io.opentracing.dropwizard.ServerTracingFeature;
-    import io.opentracing.dropwizard.DropWizardTracer;
+    import io.opentracing.contrib.dropwizard.ServerTracingFeature;
+    import io.opentracing.contrib.dropwizard.DropWizardTracer;
 
     @Override
     public void run(HelloWorldConfiguration configuration, Environment environment) {
@@ -91,7 +91,7 @@ To trace a resource, add the annotation @Trace to each method of the resource th
 
 .. code-block:: java
     
-    import io.opentracing.dropwizard.Trace;
+    import io.opentracing.contrib.dropwizard.Trace;
 
     @PATH('/some-path')
     @Produces(someType)
