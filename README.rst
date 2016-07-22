@@ -2,7 +2,14 @@
 DropWizard-Opentracing
 ######################
 
-This module provides functionality for tracing requests in DropWizard using the OpenTracing API. 
+This package enables distributed tracing in DropWizard projects via `The OpenTracing Project`_. Once a production system contends with real concurrency or splits into many services, crucial (and formerly easy) tasks become difficult: user-facing latency optimization, root-cause analysis of backend errors, communication about distinct pieces of a now-distributed system, etc. Distributed tracing follows a request on its journey from inception to completion from mobile/browser all the way to the microservices. 
+
+As core services and libraries adopt OpenTracing, the application builder is no longer burdened with the task of adding basic tracing instrumentation to their own code. In this way, developers can build their applications with the tools they prefer and benefit from built-in tracing instrumentation. OpenTracing implementations exist for major distributed tracing systems and can be bound or swapped with a one-line configuration change.
+
+If you want to learn more about the underlying Java API, visit the Java `source code`_.
+
+.. _The OpenTracing Project: http://opentracing.io/
+.. _source code: https://github.com/opentracing/opentracing-java
 
 ************
 Installation
@@ -78,7 +85,7 @@ You can trace all requests to your application by registering `ServerTracingFeat
 Using @Trace Annotations
 ------------------------  
 
-To trace a resource, add the annotation @Trace to each method of the resource that you wish to trace. If you wish to set the operation name for a specific resource method (the default is the name of the resource class) then you can add a paramater to @Trace(operationName="New Operation Name"). See the `opentracing documentation`_ for more information about choosing operation names.
+To trace a resource, add the annotation @Trace to each method of the resource that you wish to trace. If you wish to set the operation name for a specific resource method (the default is the name of the resource class) then you can add a paramater to @Trace(operationName="New Operation Name"). See the `opentracing documentation`_ on choosing operation names for more information.
 
 **Note:** The @Trace annotations can be used to set a resource method's operation name even when the ServerTracingFeature is configured without withTraceAnnotations. 
 
@@ -208,3 +215,13 @@ Just like it's up to you to decide how to pass your tracer to the filters, you a
 
 .. _Jersey injection: https://jersey.java.net/nonav/documentation/latest/user-guide.html#d0e2681
 .. _opentracing documentation: http://opentracing.io/spec/#operation-names
+
+*******************
+Further Information
+*******************
+
+If you’re interested in learning more about the OpenTracing standard, please visit `opentracing.io`_ or `join the mailing list`_. If you would like to implement OpenTracing in your project and need help, feel free to send us a note at `community@opentracing.io`_.
+
+.. _opentracing.io: http://opentracing.io/
+.. _join the mailing list: http://opentracing.us13.list-manage.com/subscribe?u=180afe03860541dae59e84153&id=19117aa6cd
+.. _community@opentracing.io: community@opentracing.io
