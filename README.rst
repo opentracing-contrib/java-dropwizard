@@ -56,12 +56,13 @@ You can use any implementation of an OpenTracing tracer. In your application fil
 Trace Requests to Server
 ========================
 
-You can trace all requests to your application by registering `ServerTracingFeature` to jersey. This feature uses the builder pattern, which enables you to integrate tracing with a variety of options as follows:
+You can trace all requests to your application by registering `ServerTracingFeature` to jersey.* This feature uses the builder pattern, which enables you to integrate tracing with a variety of options as follows:
 
 .. code-block:: java
 
-    import io.opentracing.contrib.dropwizard.ServerTracingFeature;
     import io.opentracing.contrib.dropwizard.DropWizardTracer;
+    import io.opentracing.contrib.dropwizard.ServerAttribute; //optional
+    import io.opentracing.contrib.dropwizard.ServerTracingFeature;
 
     @Override
     public void run(HelloWorldConfiguration configuration, Environment environment) {
@@ -81,6 +82,33 @@ You can trace all requests to your application by registering `ServerTracingFeat
 - `withTracedAttributes(Set<ServerAttribute>)` allows you to specify attributes of the request that you wish to be logged or tagged to your spans. All attributes available for tracing are enumerated in `io.opentracing.contrib.dropwizard.ServerAttribute`.
 
 - `withTracedProperties(Set<String>)` allows you to trace custom properties of the request. It takes in a set of property namesthat you wish to trace, and sets tags on the span.
+
+* If you're using a version of DropWizard older than 0.8, then the ServerTracingFeature is not supported. Instead, use the ServerRequestTracingFilter and ServerResponseTracingFilter as follows:
+
+.. code-block:: java
+
+    import io.opentracing.contrib.dropwizard.DropWizardTracer;
+    import io.opentracing.contrib.dropwizard.ServerAttribute; // optional
+    import io.opentracing.contrib.dropwizard.ServerRequestTracingFilter;
+    import io.opentracing.contrib.dropwizard.ServerResponseTracingFilter;
+
+    @Override
+    public void run(HelloWorldConfiguration configuration, Environment environment) {
+        final DropWizardTracer tracer = new DropWizardTracer(someOpenTracingTracer);    
+        
+        // register the filter for incoming requests
+        environment.jersey().register(new ServerRequestTracingFilter
+            .Builder(tracer)
+            .withTraceAnnotations()
+            .withTracedAttributes(someSetOfServerAttributes)
+            .withTracedProperties(someSetOfStringPropertyNames)
+            .build());
+
+        // register the filter for outgoing responses
+        environment.jersey().register(new ServerResponseTracingFilter
+            .Builder(tracer)
+            .build());
+    }
 
 Using @Trace Annotations
 ------------------------  
