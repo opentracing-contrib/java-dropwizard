@@ -64,6 +64,7 @@ You can trace all requests to your application by registering a `ServerRequestTr
             .getContainerRequestFilters()
             .add(new ServerRequestTracingFilter
                 .Builder(tracer)
+                .withOperationName(someOperationName)
                 .withTracedAttributes(someSetOfServerAttributes)
                 .withTracedProperties(someSetOfStringPropertyNames)
                 .build());
@@ -73,6 +74,8 @@ You can trace all requests to your application by registering a `ServerRequestTr
             .getContainerResponseFilters()
             .add(new ServerResponseTracingFilter(tracer));
     }
+
+- `withOperationName(String)` lets you set an operation name for incoming requests to the server.
 
 - `withTracedAttributes(Set<ServerAttribute>)` allows you to specify attributes of the request that you wish to be logged or tagged to your spans. All attributes available for tracing are enumerated in `io.opentracing.contrib.dropwizard.ServerAttribute`.
 
