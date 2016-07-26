@@ -1,8 +1,9 @@
 *.class
 
 # Builds
-target/*
-lib/*
+dropwizard-opentracing/target/*
+dropwizard-0.7-opentracing/target/*
+*/lib/*
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
