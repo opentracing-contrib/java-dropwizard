@@ -17,8 +17,8 @@ DropWizard Version
 
 DropWizard 0.8+ has upgraded to Jersey 2.0, so please choose the DropWizard-OpenTracing package that is compatible with your version of DropWizard.
 
-*< 0.8.0 :* dropwizard-0.7-opentracing
-*> 0.8.0 :* dropwizard-opentracing
+- **Version < 0.8.0 :** dropwizard-0.7-opentracing
+- **Version >= 0.8.0 :** dropwizard-opentracing
 
 *******************
 Further Information
