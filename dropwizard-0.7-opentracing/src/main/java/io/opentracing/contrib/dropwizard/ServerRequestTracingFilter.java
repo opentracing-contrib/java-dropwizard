@@ -81,9 +81,6 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     
     @Override
     public ContainerRequest filter(ContainerRequest request) {
-            // for(Object resource : request.getUriInfo().getMatchedResources()) {
-            //     this.operationName += resource.getClass().getSimpleName() + " ";
-            // }
         String operationName;
         if(this.operationName == "") {
             operationName = request.getRequestUri().toString();

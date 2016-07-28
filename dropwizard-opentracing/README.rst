@@ -173,7 +173,7 @@ And to perform operations on the current span:
         // create a child span
         Span childSpan = tracer.getTracer()
             .buildSpan("some operation name")
-            .withParent(span)
+            .asChildOf(span)
             .start();
 
         // remember to finish any spans that you manually create
