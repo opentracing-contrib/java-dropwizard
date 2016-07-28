@@ -11,7 +11,7 @@ Maven
     <dependency>
         <groupId>io.opentracing.contrib.dropwizard</groupId>
         <artifactId>dropwizard-opentracing</artifactId>
-        <version>0.1.2</version>
+        <version>0.1.3</version>
     </dependency>
 
 Gradle
@@ -19,7 +19,7 @@ Gradle
 .. code-block::
 
     dependencies {
-        compile 'io.opentracing.contrib.dropwizard:dropwizard-opentracing:0.1.2'
+        compile 'io.opentracing.contrib.dropwizard:dropwizard-opentracing:0.1.3'
     }
 
 *****
@@ -57,12 +57,15 @@ You can trace all requests to your application by registering `ServerTracingFeat
         environment.jersey().register(new ServerTracingFeature
             .Builder(tracer)
             .withTraceAnnotations()
+            .withOperationName(someOperationName)
             .withTracedAttributes(someSetOfServerAttributes)
             .withTracedProperties(someSetOfStringPropertyNames)
             .build());
     }
 
 - `withTraceAnnotations` turns on tracing annotations. By default, all requests to your application are traced. However, if tracing annotations are enabled, then only resource methods annotated with @Trace will be traced.
+
+- `withOperationName(String)` lets you set an operation name for incoming requests to the server. If not specified, defaults to the name of the resource class that handles the request. See the `opentracing documentation`_ on choosing operation names for more information.
 
 - `withTracedAttributes(Set<ServerAttribute>)` allows you to specify attributes of the request that you wish to be logged or tagged to your spans. All attributes available for tracing are enumerated in `io.opentracing.contrib.dropwizard.ServerAttribute`.
 
@@ -71,7 +74,7 @@ You can trace all requests to your application by registering `ServerTracingFeat
 Using @Trace Annotations
 ------------------------  
 
-To trace a resource, add the annotation @Trace to each method of the resource that you wish to trace. If you wish to set the operation name for a specific resource method (the default is the name of the resource class) then you can add a paramater to @Trace(operationName="New Operation Name"). See the `opentracing documentation`_ on choosing operation names for more information.
+To trace a resource, add the annotation @Trace to each method of the resource that you wish to trace. If you wish to set the operation name for a specific resource method then you can add a parameter to `@Trace(operationName="New Operation Name")`.
 
 **Note:** The @Trace annotations can be used to set a resource method's operation name even when the ServerTracingFeature is configured without withTraceAnnotations. 
 
@@ -135,7 +138,7 @@ If you want to trace outbound requests using Jersey clients, we provide a `Clien
 
 - `withRequest(Request)` configures the `ClientRequestTracingFilter` continue any the current trace. In this example, since someSubresource is annotated with `@Trace`, the filter must be configured to link the current server span with the outgoing client span; otherwise, all client requests will start new traces. 
 
-- `withOperationName(String)` builds the ClientTracingFeature with an operation name in order to set the name of all spans created by this client. Otherwise, the operation name will default to "Client".
+- `withOperationName(String)` builds the ClientTracingFeature with an operation name in order to set the name of all spans created by this WebTarget (or Client if you register it to the client instead). Otherwise, the operation name will default to "Client".
 
 - `withTracedAttributes(Set<ClientAttributes>)` and `withTracedProperties(Set<String>)` operate the same as they do on `ServerTracingFeature`
 

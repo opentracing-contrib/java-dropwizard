@@ -26,14 +26,17 @@ public class ServerTracingFeature implements DynamicFeature {
     private final Set<ServerAttribute> tracedAttributes;
     private final Set<String> tracedProperties;
     private final boolean traceAll;
+    private final String operationName;
 
     private ServerTracingFeature(
         DropWizardTracer tracer, 
+        String operationName,
         Set<ServerAttribute> tracedAttributes, 
         Set<String> tracedProperties,
         boolean traceAll
     ) {
         this.tracer = tracer;
+        this.operationName = operationName;
         this.tracedAttributes = tracedAttributes;
         this.tracedProperties = tracedProperties;
         this.traceAll = traceAll;
@@ -42,9 +45,11 @@ public class ServerTracingFeature implements DynamicFeature {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         Trace annotation = resourceInfo.getResourceMethod().getAnnotation(Trace.class);
-        String operationName = "";
+        String operationName = this.operationName;
         if (annotation != null) {
-            operationName = annotation.operationName();
+            if(!annotation.operationName().equals("")) {
+                operationName = annotation.operationName();
+            }
             context.register(new ServerRequestTracingFilter(this.tracer, operationName,
                 this.tracedAttributes, this.tracedProperties));
             context.register(new ServerResponseTracingFilter(this.tracer));  
@@ -66,6 +71,7 @@ public class ServerTracingFeature implements DynamicFeature {
         private Set<ServerAttribute> tracedAttributes;
         private Set<String> tracedProperties;
         private boolean traceAll;
+        private String operationName;
 
         /**
          * @param tracer to use to trace requests to the server
@@ -75,6 +81,7 @@ public class ServerTracingFeature implements DynamicFeature {
             this.tracedAttributes = new HashSet<ServerAttribute>();
             this.tracedProperties = new HashSet<String>();
             this.traceAll = true;
+            this.operationName = "";
         }
 
         /**
@@ -108,12 +115,17 @@ public class ServerTracingFeature implements DynamicFeature {
             return this;
         }
 
+        public Builder withOperationName(String operationName) {
+            this.operationName = operationName;
+            return this;
+        }
+
         /**
          * @return ServerTracingFeature with the configuration of this Builder
          */
         public ServerTracingFeature build() {
-            return new ServerTracingFeature(this.tracer, this.tracedAttributes,
-                this.tracedProperties, this.traceAll);
+            return new ServerTracingFeature(this.tracer, this.operationName, 
+                this.tracedAttributes, this.tracedProperties, this.traceAll);
         }
     }
 }

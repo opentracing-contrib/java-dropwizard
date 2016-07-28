@@ -15,7 +15,7 @@ Maven
     <dependency>
         <groupId>io.opentracing.contrib.dropwizard</groupId>
         <artifactId>dropwizard-0.7-opentracing</artifactId>
-        <version>0.1.0</version>
+        <version>0.1.1</version>
     </dependency>
 
 Gradle
@@ -23,7 +23,7 @@ Gradle
 .. code-block::
 
     dependencies {
-        compile 'io.opentracing.contrib.dropwizard:dropwizard-0.7-opentracing:0.1.0'
+        compile 'io.opentracing.contrib.dropwizard:dropwizard-0.7-opentracing:0.1.1'
     }
 
 *****
@@ -75,11 +75,41 @@ You can trace all requests to your application by registering a `ServerRequestTr
             .add(new ServerResponseTracingFilter(tracer));
     }
 
-- `withOperationName(String)` lets you set an operation name for incoming requests to the server.
+- `withOperationName(String)` lets you set an operation name for incoming requests to the server. If not specified, defaults to the uri of the incoming request.
 
 - `withTracedAttributes(Set<ServerAttribute>)` allows you to specify attributes of the request that you wish to be logged or tagged to your spans. All attributes available for tracing are enumerated in `io.opentracing.contrib.dropwizard.ServerAttribute`.
 
-- `withTracedProperties(Set<String>)` allows you to trace custom properties of the request. It takes in a set of property namesthat you wish to trace, and sets tags on the span.
+- `withTracedProperties(Set<String>)` allows you to trace custom properties of the request. It takes in a set of property names that you wish to trace, and sets tags on the span.
+
+Trace Client Requests
+=====================
+
+If you want to trace outbound requests using Jersey clients, we provide a `ClientTracingFilter` class. This filter also follows the builder pattern. It should be registered to a client or webtarget, and if you want the feature to be able to continue a trace (rather than starting a new trace), then it must be registered within the scope of a resource. See below for example useage.
+
+.. code-block:: java
+
+    @GET
+    @Path("/some-path")
+    public String someSubresource() {
+        WebResource wr = client.target("http://some-url.com/some/request/path");
+
+        wr.addFilter(new ClientTracingFeature
+            .Builder(tracer)
+            .withRequest(request)
+            .withOperationName(someOperationName)
+            .withTracedAttributes(someSetOfClientAttributes)
+            .withTracedProperties(someSetOfStringPropertyNames)
+            .build();
+
+        ClientResponse response = wr.get(ClientResponse.class);
+        return someHandler(response);
+    }
+
+- `withRequest(Request)` configures the `ClientTracingFilter` continue any the current trace. The filter must be configured like this to link the current server span with the outgoing client span; otherwise, all client requests will start new traces. 
+
+- `withOperationName(String)` builds the ClientTracingFilter with an operation name in order to set the name of all spans created by this WebResource (or Client if you register it to the client instead). Otherwise, the operation name will default to "Client".
+
+- `withTracedAttributes(Set<ClientAttributes>)` and `withTracedProperties(Set<String>)` operate the same as they do on `ServerRequestTracingFilter`
 
 Accessing the Current Span
 ==========================

@@ -28,11 +28,10 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     private final DropWizardTracer tracer;
     private final Set<ServerAttribute> tracedAttributes;
     private final Set<String> tracedProperties;
-    private String operationName;
+    private final String operationName;
 
     /**
      * @param tracer to trace requests with
-     * @param operationName for any spans created by this filter
      * @param tracedAttributes any ServiceAttributes to log to spans
      * @param tracedProperties any request properties to log to spans
      */
@@ -75,21 +74,22 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         }
 
         public ServerRequestTracingFilter build() {
-            return new ServerRequestTracingFilter(this.tracer, this.operationName, 
+            return new ServerRequestTracingFilter(this.tracer, this.operationName,
                 this.tracedAttributes, this.tracedProperties);
         }
     }
     
     @Override
     public ContainerRequest filter(ContainerRequest request) {
-        // set the operation name
-        if(this.operationName.equals("")) {
             // for(Object resource : request.getUriInfo().getMatchedResources()) {
             //     this.operationName += resource.getClass().getSimpleName() + " ";
             // }
-            this.operationName = request.getRequestUri().toString();
+        String operationName;
+        if(this.operationName == "") {
+            operationName = request.getRequestUri().toString();
+        } else {
+            operationName = this.operationName;
         }
-
         // format the headers for extraction
         Span span;
         MultivaluedMap<String, String> rawHeaders = request.getRequestHeaders();
@@ -106,12 +106,12 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
                 }
             });
             if(parentSpan == null){
-                span = tracer.getTracer().buildSpan(this.operationName).start();
+                span = tracer.getTracer().buildSpan(operationName).start();
             } else {
-                span = tracer.getTracer().buildSpan(this.operationName).asChildOf(parentSpan).start();
+                span = tracer.getTracer().buildSpan(operationName).asChildOf(parentSpan).start();
             }
         } catch(IllegalArgumentException e) {
-            span = tracer.getTracer().buildSpan(this.operationName).start();
+            span = tracer.getTracer().buildSpan(operationName).start();
         }
 
         // trace attributes
