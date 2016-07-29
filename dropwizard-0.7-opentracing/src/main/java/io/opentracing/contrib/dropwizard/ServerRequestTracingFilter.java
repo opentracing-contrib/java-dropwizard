@@ -54,25 +54,45 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         private Set<String> tracedProperties = new HashSet<String>();
         private String operationName = "";
 
+        /**
+         * @param tracer the tracer to trace the server requests with
+         */
         public Builder(DropWizardTracer tracer) {
             this.tracer = tracer;
         }
 
+        /**
+         * @param attributes a set of request attributes that you want 
+         *  to tag to spans created for server requests
+         * @return Builder configured with added traced attributes
+         */
         public Builder withTracedAttributes(Set<ServerAttribute> attributes) {
             this.tracedAttributes = attributes;
             return this;
         }
 
+        /**
+         * @param properties of a request to the server to tag 
+         *  to spans created for that request
+         * @return Builder configured with added traced properties
+         */
         public Builder withTracedProperties(Set<String> properties) {
             this.tracedProperties = properties;
             return this;
         }
-
+        
+        /**
+         * @param operationName for spans created by this filter
+         * @return Builder configured with added operationName
+         */
         public Builder withOperationName(String operationName) {
             this.operationName = operationName;
             return this;
         }
 
+        /**
+         * @return ServerRequestTracingFilter with the configuration of this Builder 
+         */
         public ServerRequestTracingFilter build() {
             return new ServerRequestTracingFilter(this.tracer, this.operationName,
                 this.tracedAttributes, this.tracedProperties);
