@@ -2,7 +2,8 @@ package io.opentracing.contrib.dropwizard;
 
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
-import io.opentracing.propagation.TextMapReader;
+import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMap;
 
 import io.opentracing.contrib.dropwizard.DropWizardTracer;
 import io.opentracing.contrib.dropwizard.ServerAttribute;
@@ -49,8 +50,8 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         // set the operation name
-        if(this.operationName.equals("")) {
-            for(Object resource : requestContext.getUriInfo().getMatchedResources()) {
+        if (this.operationName.equals("")) {
+            for (Object resource : requestContext.getUriInfo().getMatchedResources()) {
                 this.operationName += resource.getClass().getSimpleName() + " ";
             }
         }
@@ -59,18 +60,21 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         Span span;
         MultivaluedMap<String, String> rawHeaders = requestContext.getHeaders();
         final HashMap<String, String> headers = new HashMap<String, String>();
-        for(String key : rawHeaders.keySet()){
+        for (String key : rawHeaders.keySet()){
             headers.put(key, rawHeaders.get(key).get(0));
         }
 
         // extract the client span
         try {
-            SpanContext parentSpan = tracer.getTracer().extract(new TextMapReader() {
+            SpanContext parentSpan = tracer.getTracer().extract(Format.Builtin.HTTP_HEADERS, new TextMap() {
+		public void put(String key, String value) {
+		    throw new UnsupportedOperationException("extract() should only ever call getEntries()");
+		}
                 public Iterator<Map.Entry<String, String>> getEntries() {
                     return headers.entrySet().iterator();
                 }
             });
-            if(parentSpan == null){
+            if (parentSpan == null){
                 span = tracer.getTracer().buildSpan(this.operationName).start();
             } else {
                 span = tracer.getTracer().buildSpan(this.operationName).asChildOf(parentSpan).start();
@@ -80,7 +84,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         }
 
         // trace attributes
-        for(ServerAttribute attribute : this.tracedAttributes) {
+        for (ServerAttribute attribute : this.tracedAttributes) {
             switch(attribute) {
                 case ACCEPTABLE_LANGUAGES: 
                     try { span.setTag("Acceptable Languages", requestContext.getAcceptableLanguages().toString()); }
@@ -138,9 +142,9 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         }
 
         // trace properties
-        for(String propertyName : this.tracedProperties) {
+        for (String propertyName : this.tracedProperties) {
             Object property = requestContext.getProperty(propertyName);
-            if(property != null) {
+            if (property != null) {
                 span.log(propertyName, property);
             }
         }

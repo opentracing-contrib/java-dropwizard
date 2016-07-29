@@ -47,7 +47,7 @@ public class ServerTracingFeature implements DynamicFeature {
         Trace annotation = resourceInfo.getResourceMethod().getAnnotation(Trace.class);
         String operationName = this.operationName;
         if (annotation != null) {
-            if(!annotation.operationName().equals("")) {
+            if (!annotation.operationName().equals("")) {
                 operationName = annotation.operationName();
             }
             context.register(new ServerRequestTracingFilter(this.tracer, operationName,
