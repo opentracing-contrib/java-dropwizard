@@ -65,7 +65,7 @@ public class DropWizardTracer {
 
     protected void finishServerSpan(Request request) {
         Span span = this.serverSpans.get(request);
-        if(span != null) {
+        if (span != null) {
             this.serverSpans.remove(request);
             span.finish();
         }
@@ -73,7 +73,7 @@ public class DropWizardTracer {
 
     protected void finishClientSpan(ClientRequest requestCtx) {
         Span span = this.clientSpans.get(requestCtx);
-        if(span != null) {
+        if (span != null) {
             this.clientSpans.remove(requestCtx);
             span.finish();
         }

@@ -2,7 +2,8 @@ package io.opentracing.contrib.dropwizard;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;
-import io.opentracing.propagation.TextMapWriter;
+import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMap;
 import io.opentracing.contrib.dropwizard.ClientAttribute;
 import io.opentracing.contrib.dropwizard.DropWizardTracer;
 
@@ -56,15 +57,15 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
     public void filter(ClientRequestContext requestContext) throws IOException {
         
         // set the operation name
-        if(this.operationName == ""){
+        if (this.operationName == ""){
             this.operationName = "Client";
         }
 
         // create the new span
         Span span = null;
-        if(this.request != null) {
+        if (this.request != null) {
             Span parentSpan = this.tracer.getSpan(request);
-            if(parentSpan == null) {
+            if (parentSpan == null) {
                 span = this.tracer.getTracer().buildSpan(operationName).start();
             } else {
                 span = this.tracer.getTracer().buildSpan(operationName).asChildOf(parentSpan.context()).start();
@@ -74,7 +75,7 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
         }
 
         // trace attributes
-       for(ClientAttribute attribute : this.tracedAttributes) {
+       for (ClientAttribute attribute : this.tracedAttributes) {
             switch(attribute) {
                 case ACCEPTABLE_LANGUAGES: 
                     try { span.setTag("Acceptable Languages", requestContext.getAcceptableLanguages().toString()); }
@@ -136,9 +137,9 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
         }
 
         // trace properties
-        for(String propertyName : this.tracedProperties) {
+        for (String propertyName : this.tracedProperties) {
             Object property = requestContext.getProperty(propertyName);
-            if(property != null) {
+            if (property != null) {
                 span.log(propertyName, property);
             }
         }
@@ -148,9 +149,12 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
 
         // add the span to the headers
         final MultivaluedMap<String, Object> headers = requestContext.getHeaders();
-        tracer.getTracer().inject(span.context(), new TextMapWriter() {
+        tracer.getTracer().inject(span.context(), Format.Builtin.HTTP_HEADERS, new TextMap() {
             public void put(String key, String value) {
                 headers.add(key, value);
+            }
+	    public Iterator<Map.Entry<String, String>> getEntries() {
+                throw new UnsupportedOperationException("inject() should only ever call put()");
             }
         });
     }
