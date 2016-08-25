@@ -1,23 +1,16 @@
 package io.opentracing.contrib.dropwizard;
 
 import io.opentracing.Span;
-import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
 import io.opentracing.propagation.TextMap;
-import io.opentracing.contrib.dropwizard.ClientAttribute;
-import io.opentracing.contrib.dropwizard.DropWizardTracer;
 
-import java.io.IOException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
-
-import java.util.Map;
-import java.util.HashMap;
+import javax.ws.rs.core.Request;
+import java.io.IOException;
 import java.util.Iterator;
-
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -151,11 +144,14 @@ public class ClientRequestTracingFilter implements ClientRequestFilter {
         // add the span to the headers
         final MultivaluedMap<String, Object> headers = requestContext.getHeaders();
         tracer.getTracer().inject(span.context(), Format.Builtin.HTTP_HEADERS, new TextMap() {
-            public void put(String key, String value) {
-                headers.add(key, value);
+            @Override
+            public void put(String k, String v) {
+                headers.putSingle(k, v);
             }
-	    public Iterator<Map.Entry<String, String>> getEntries() {
-                throw new UnsupportedOperationException("inject() should only ever call put()");
+
+            @Override
+            public Iterator<Map.Entry<String, String>> iterator() {
+                throw new UnsupportedOperationException("iterator should never be used with Tracer.inject()");
             }
         });
     }

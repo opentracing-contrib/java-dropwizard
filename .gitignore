@@ -1,4 +1,6 @@
 *.class
+*.iml
+.idea
 
 # Builds
 dropwizard-opentracing/target/*
