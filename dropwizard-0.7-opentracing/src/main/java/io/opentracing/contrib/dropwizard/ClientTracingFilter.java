@@ -1,24 +1,18 @@
 package io.opentracing.contrib.dropwizard;
 
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.filter.ClientFilter;
 import io.opentracing.Span;
-import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
 import io.opentracing.propagation.TextMap;
-import io.opentracing.contrib.dropwizard.ClientAttribute;
-import io.opentracing.contrib.dropwizard.DropWizardTracer;
 
-import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientRequest;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
-
-import java.util.Map;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Context;
 
 /**
  * When registered to a client or webtarget along with a ClientResponseTracingFilter,
@@ -34,7 +28,7 @@ public class ClientTracingFilter extends ClientFilter {
 
     /**
      * @param tracer to trace requests with
-     * @param request the current request to be a parent span
+     * @param currentRequest the current request to be a parent span
      *      for any client spans created (null if none)
      * @param operationName for any spans created by this filter
      * @param tracedAttributes any ClientAttributes to log to the span
@@ -181,14 +175,16 @@ public class ClientTracingFilter extends ClientFilter {
         // add the span to the headers
         final MultivaluedMap<String, Object> headers = request.getHeaders();
         tracer.getTracer().inject(span.context(), Format.Builtin.HTTP_HEADERS, new TextMap() {
-            public void put(String key, String value) {
-                headers.add(key, value);
+            @Override
+            public void put(String k, String v) {
+                headers.putSingle(k, v);
             }
-	    public Iterator<Map.Entry<String, String>> getEntries() {
-                throw new UnsupportedOperationException("inject() should only ever call put()");
+
+            @Override
+            public Iterator<Map.Entry<String, String>> iterator() {
+                throw new UnsupportedOperationException("iterator should never be used with Tracer.inject()");
             }
         });
-
         ClientResponse response = getNext().handle(request);
 
         this.tracer.finishClientSpan(request);

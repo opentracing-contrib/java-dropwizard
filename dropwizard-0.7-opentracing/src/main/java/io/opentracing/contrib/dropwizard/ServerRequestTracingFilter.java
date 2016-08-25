@@ -2,23 +2,15 @@ package io.opentracing.contrib.dropwizard;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
-
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.Format;
-import io.opentracing.propagation.TextMap;
-
-import io.opentracing.contrib.dropwizard.DropWizardTracer;
-import io.opentracing.contrib.dropwizard.ServerAttribute;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Iterator;
+import io.opentracing.propagation.TextMapExtractAdapter;
 
 import javax.ws.rs.core.MultivaluedMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * When registered to a DropWizard service along with a ServerResponseTracingFilter,
@@ -118,14 +110,9 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
 
         // extract the client span
         try {
-            SpanContext parentSpan = tracer.getTracer().extract(Format.Builtin.HTTP_HEADERS, new TextMap() {
-		public void put(String key, String value) {
-		    throw new UnsupportedOperationException("extract() should only ever call getEntries()");
-		}
-                public Iterator<Map.Entry<String, String>> getEntries() {
-                    return headers.entrySet().iterator();
-                }
-            });
+            SpanContext parentSpan = tracer.getTracer().extract(
+                    Format.Builtin.HTTP_HEADERS,
+                    new TextMapExtractAdapter(headers));
             if (parentSpan == null){
                 span = tracer.getTracer().buildSpan(operationName).start();
             } else {
