@@ -29,3 +29,9 @@ If you’re interested in learning more about the OpenTracing standard, please v
 .. _opentracing.io: http://opentracing.io/
 .. _join the mailing list: http://opentracing.us13.list-manage.com/subscribe?u=180afe03860541dae59e84153&id=19117aa6cd
 .. _community@opentracing.io: community@opentracing.io
+
+******************
+Publishing/Deploying Maven artifacts
+******************
+
+Export OSSRH_USERNAME, OSSRH_PASSWORD, and GPG_PASSWORD environment variables, then run `mvn -s ../settings.xml deploy` from each of the pre- and post-0.7 subdirectories.

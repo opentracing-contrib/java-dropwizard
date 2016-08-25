@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.opentracing.contrib.dropwizard</groupId>
     <artifactId>dropwizard-opentracing</artifactId>
-    <version>0.1.4</version>
+    <version>0.2.0</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Support for integrating OpenTracing in DropWizard projects</description>
-    <url>http://github.com/kcamenzind/dropwizard-opentracing</url>
+    <url>http://github.com/opentracing-contrib/dropwizard-opentracing</url>
 
     <packaging>jar</packaging>
 
