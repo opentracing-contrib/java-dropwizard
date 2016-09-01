@@ -7,11 +7,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
-import io.opentracing.contrib.dropwizard.DropWizardTracer;
-import io.opentracing.contrib.dropwizard.ServerAttribute;
-import io.opentracing.contrib.dropwizard.ServerRequestTracingFilter;
-import io.opentracing.contrib.dropwizard.ServerResponseTracingFilter;
-import io.opentracing.contrib.dropwizard.Trace;
+import io.opentracing.Span;
 
 /**
  * When registered to a DropWizard application, this feature
@@ -27,19 +23,23 @@ public class ServerTracingFeature implements DynamicFeature {
     private final Set<String> tracedProperties;
     private final boolean traceAll;
     private final String operationName;
+    private final RequestSpanDecorator decorator;
+    static ThreadLocal<Span> threadLocalRequestSpan = new ThreadLocal<Span>();
 
     private ServerTracingFeature(
         DropWizardTracer tracer, 
         String operationName,
         Set<ServerAttribute> tracedAttributes, 
         Set<String> tracedProperties,
-        boolean traceAll
+        boolean traceAll,
+        RequestSpanDecorator decorator
     ) {
         this.tracer = tracer;
         this.operationName = operationName;
         this.tracedAttributes = tracedAttributes;
         this.tracedProperties = tracedProperties;
         this.traceAll = traceAll;
+        this.decorator = decorator;
     }
 
     @Override
@@ -51,15 +51,29 @@ public class ServerTracingFeature implements DynamicFeature {
                 operationName = annotation.operationName();
             }
             context.register(new ServerRequestTracingFilter(this.tracer, operationName,
-                this.tracedAttributes, this.tracedProperties));
+                this.tracedAttributes, this.tracedProperties, this.decorator));
             context.register(new ServerResponseTracingFilter(this.tracer));  
         } else {
             if (traceAll) {
                 context.register(new ServerRequestTracingFilter(this.tracer, operationName,
-                    this.tracedAttributes, this.tracedProperties));
+                    this.tracedAttributes, this.tracedProperties, this.decorator));
                 context.register(new ServerResponseTracingFilter(this.tracer));
             } 
         }
+    }
+
+    /**
+     * Returns the Span associated with the active DropWizard request.
+     *
+     * NOTE: this may return null when there is no active DropWizard request or that request is not traced; moreover,
+     * if request processing moves from thread to thread, this mechanism may return null or perhaps even the wrong
+     * Span. Use with some caution. If it is possible to explicitly propagate a Span, that will always be more rigorous
+     * (though of course it's also often not practical or expedient).
+     *
+     * @return The Span associated with the active DropWizard request.
+     */
+    public static Span getThreadLocalRequestSpan() {
+        return ServerTracingFeature.threadLocalRequestSpan.get();
     }
 
     /**
@@ -72,6 +86,7 @@ public class ServerTracingFeature implements DynamicFeature {
         private Set<String> tracedProperties;
         private boolean traceAll;
         private String operationName;
+        private RequestSpanDecorator decorator;
 
         /**
          * @param tracer to use to trace requests to the server
@@ -115,6 +130,14 @@ public class ServerTracingFeature implements DynamicFeature {
             return this;
         }
 
+        /**
+         * @param decorator an (optional) RequestSpanDecorator which is applied to each [Request, Span] pair.
+         */
+        public Builder withRequestSpanDecorator(RequestSpanDecorator decorator) {
+            this.decorator = decorator;
+            return this;
+        }
+
         public Builder withOperationName(String operationName) {
             this.operationName = operationName;
             return this;
@@ -125,7 +148,7 @@ public class ServerTracingFeature implements DynamicFeature {
          */
         public ServerTracingFeature build() {
             return new ServerTracingFeature(this.tracer, this.operationName, 
-                this.tracedAttributes, this.tracedProperties, this.traceAll);
+                this.tracedAttributes, this.tracedProperties, this.traceAll, this.decorator);
         }
     }
 }

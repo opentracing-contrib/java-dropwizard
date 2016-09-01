@@ -22,6 +22,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     private final Set<ServerAttribute> tracedAttributes;
     private final Set<String> tracedProperties;
     private final String operationName;
+    private final RequestSpanDecorator decorator;
 
     /**
      * @param tracer to trace requests with
@@ -32,12 +33,14 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         DropWizardTracer tracer,
         String operationName,
         Set<ServerAttribute> tracedAttributes, 
-        Set<String> tracedProperties
+        Set<String> tracedProperties,
+        RequestSpanDecorator decorator
     ) {
         this.tracer = tracer;
         this.operationName = operationName;
         this.tracedProperties = tracedProperties;
         this.tracedAttributes = tracedAttributes;
+        this.decorator = decorator;
     }
 
     public static class Builder {
@@ -46,6 +49,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         private Set<ServerAttribute> tracedAttributes = new HashSet<ServerAttribute>();
         private Set<String> tracedProperties = new HashSet<String>();
         private String operationName = "";
+        private RequestSpanDecorator decorator;
 
         /**
          * @param tracer the tracer to trace the server requests with
@@ -73,7 +77,15 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
             this.tracedProperties = properties;
             return this;
         }
-        
+
+        /**
+         * @param decorator an (optional) RequestSpanDecorator which is applied to each [Request, Span] pair.
+         */
+        public Builder withRequestSpanDecorator(RequestSpanDecorator decorator) {
+            this.decorator = decorator;
+            return this;
+        }
+
         /**
          * @param operationName for spans created by this filter
          * @return Builder configured with added operationName
@@ -88,7 +100,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
          */
         public ServerRequestTracingFilter build() {
             return new ServerRequestTracingFilter(this.tracer, this.operationName,
-                this.tracedAttributes, this.tracedProperties);
+                this.tracedAttributes, this.tracedProperties, this.decorator);
         }
     }
     
@@ -170,7 +182,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
                     catch(NullPointerException npe) {}
                     break;
                 case PATH:
-                    try { span.setTag("Property Names", request.getPath().toString()); }
+                    try { span.setTag("Property Names", request.getPath()); }
                     catch(NullPointerException npe) {}
                     break;
                  case QUERY_PARAMETERS: 
@@ -198,6 +210,10 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
             if (property != null) {
                 span.log(propertyName, property);
             }
+        }
+
+        if (this.decorator != null) {
+            this.decorator.decorate(request, span);
         }
 
         // add the new span to the trace

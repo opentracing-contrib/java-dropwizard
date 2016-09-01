@@ -69,7 +69,22 @@ You can trace all requests to your application by registering `ServerTracingFeat
 
 - `withTracedAttributes(Set<ServerAttribute>)` allows you to specify attributes of the request that you wish to be logged or tagged to your spans. All attributes available for tracing are enumerated in `io.opentracing.contrib.dropwizard.ServerAttribute`.
 
-- `withTracedProperties(Set<String>)` allows you to trace custom properties of the request. It takes in a set of property namesthat you wish to trace, and sets tags on the span.
+- `withTracedProperties(Set<String>)` allows you to trace custom properties of the request. It takes in a set of property names that you wish to trace, and sets tags on the span.
+
+- `withRequestSpanDecorator(RequestSpanDecorator)` allows you to make arbitrary mutations to a request's Span object given a ContainerRequestContext. For example:
+
+.. code-block:: java
+
+    // Continuing in the spirit of the ServerTracingFeature example above...
+    environment.jersey().register(new ServerTracingFeature
+        .Builder(tracer)
+        .withRequestSpanDecorator(new RequestSpanDecorator() {
+            public void decorate(ContainerRequestContext requestContext, Span span) {
+                span.setTag("requestId", requestContext.getHeaderString("X-Request-Id"));
+            }
+        })
+        .build());
+
 
 Using @Trace Annotations
 ------------------------  

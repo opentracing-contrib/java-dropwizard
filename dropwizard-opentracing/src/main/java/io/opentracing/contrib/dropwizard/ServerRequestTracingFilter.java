@@ -22,6 +22,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
     private final Set<ServerAttribute> tracedAttributes;
     private final Set<String> tracedProperties;
     private String operationName;
+    private RequestSpanDecorator decorator;
 
     /**
      * @param tracer to trace requests with
@@ -33,12 +34,14 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
         DropWizardTracer tracer,
         String operationName,
         Set<ServerAttribute> tracedAttributes, 
-        Set<String> tracedProperties
+        Set<String> tracedProperties,
+        RequestSpanDecorator decorator
     ) {
         this.tracer = tracer;
         this.operationName = operationName;
         this.tracedProperties = tracedProperties;
         this.tracedAttributes = tracedAttributes;
+        this.decorator = decorator;
     }
     
     @Override
@@ -138,7 +141,12 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
             }
         }
 
+        if (this.decorator != null) {
+            this.decorator.decorate(requestContext, span);
+        }
+
         // add the new span to the trace
         tracer.addServerSpan(requestContext.getRequest(), span);
+        ServerTracingFeature.threadLocalRequestSpan.set(span);
     }
 }
