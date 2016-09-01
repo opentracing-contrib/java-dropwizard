@@ -7,11 +7,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
-import io.opentracing.contrib.dropwizard.DropWizardTracer;
-import io.opentracing.contrib.dropwizard.ServerAttribute;
-import io.opentracing.contrib.dropwizard.ServerRequestTracingFilter;
-import io.opentracing.contrib.dropwizard.ServerResponseTracingFilter;
-import io.opentracing.contrib.dropwizard.Trace;
+import io.opentracing.Span;
 
 /**
  * When registered to a DropWizard application, this feature
@@ -28,6 +24,7 @@ public class ServerTracingFeature implements DynamicFeature {
     private final boolean traceAll;
     private final String operationName;
     private final RequestSpanDecorator decorator;
+    static ThreadLocal<Span> threadLocalRequestSpan = new ThreadLocal<Span>();
 
     private ServerTracingFeature(
         DropWizardTracer tracer, 
@@ -63,6 +60,20 @@ public class ServerTracingFeature implements DynamicFeature {
                 context.register(new ServerResponseTracingFilter(this.tracer));
             } 
         }
+    }
+
+    /**
+     * Returns the Span associated with the active DropWizard request.
+     *
+     * NOTE: this may return null when there is no active DropWizard request or that request is not traced; moreover,
+     * if request processing moves from thread to thread, this mechanism may return null or perhaps even the wrong
+     * Span. Use with some caution. If it is possible to explicitly propagate a Span, that will always be more rigorous
+     * (though of course it's also often not practical or expedient).
+     *
+     * @return The Span associated with the active DropWizard request.
+     */
+    public static Span getThreadLocalRequestSpan() {
+        return ServerTracingFeature.threadLocalRequestSpan.get();
     }
 
     /**

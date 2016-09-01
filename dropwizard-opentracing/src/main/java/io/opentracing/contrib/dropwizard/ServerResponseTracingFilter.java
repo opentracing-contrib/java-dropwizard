@@ -1,8 +1,5 @@
 package io.opentracing.contrib.dropwizard;
 
-import io.opentracing.contrib.dropwizard.DropWizardTracer;
-import io.opentracing.Span;
-
 import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -37,5 +34,6 @@ public class ServerResponseTracingFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         tracer.finishServerSpan(requestContext.getRequest());
+        ServerTracingFeature.threadLocalRequestSpan.set(null);
     }
 }

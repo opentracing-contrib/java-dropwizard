@@ -147,5 +147,6 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
 
         // add the new span to the trace
         tracer.addServerSpan(requestContext.getRequest(), span);
+        ServerTracingFeature.threadLocalRequestSpan.set(span);
     }
 }
