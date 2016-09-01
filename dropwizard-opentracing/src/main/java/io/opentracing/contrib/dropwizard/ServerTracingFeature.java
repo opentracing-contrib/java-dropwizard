@@ -132,6 +132,7 @@ public class ServerTracingFeature implements DynamicFeature {
 
         /**
          * @param decorator an (optional) RequestSpanDecorator which is applied to each [Request, Span] pair.
+         * @return Builder for chaining
          */
         public Builder withRequestSpanDecorator(RequestSpanDecorator decorator) {
             this.decorator = decorator;

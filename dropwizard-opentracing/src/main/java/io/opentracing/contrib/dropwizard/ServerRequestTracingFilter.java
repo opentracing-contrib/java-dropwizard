@@ -29,6 +29,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
      * @param operationName for any spans created by this filter
      * @param tracedAttributes any ServiceAttributes to log to spans
      * @param tracedProperties any request properties to log to spans
+     * @param decorator an optional decorator for the request spans
      */
     public ServerRequestTracingFilter(
         DropWizardTracer tracer,

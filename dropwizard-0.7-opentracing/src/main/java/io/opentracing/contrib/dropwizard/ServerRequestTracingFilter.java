@@ -26,8 +26,10 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
 
     /**
      * @param tracer to trace requests with
+     * @param operationName the operation name for the request spans
      * @param tracedAttributes any ServiceAttributes to log to spans
      * @param tracedProperties any request properties to log to spans
+     * @param decorator an optional decorator for request spans
      */
     private ServerRequestTracingFilter(
         DropWizardTracer tracer,
@@ -80,6 +82,7 @@ public class ServerRequestTracingFilter implements ContainerRequestFilter {
 
         /**
          * @param decorator an (optional) RequestSpanDecorator which is applied to each [Request, Span] pair.
+         * @return Builder for chaining
          */
         public Builder withRequestSpanDecorator(RequestSpanDecorator decorator) {
             this.decorator = decorator;
