@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.opentracing.contrib.dropwizard</groupId>
     <artifactId>dropwizard-opentracing</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Support for integrating OpenTracing in DropWizard projects</description>
