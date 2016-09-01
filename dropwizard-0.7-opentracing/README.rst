@@ -81,6 +81,23 @@ You can trace all requests to your application by registering a `ServerRequestTr
 
 - `withTracedProperties(Set<String>)` allows you to trace custom properties of the request. It takes in a set of property names that you wish to trace, and sets tags on the span.
 
+- `withRequestSpanDecorator(RequestSpanDecorator)` allows you to make arbitrary mutations to a request's Span object given a ContainerRequest. For example:
+
+.. code-block:: java
+
+    // Continuing in the spirit of the ServerRequestTracingFilter example above...
+    environment.jersey()
+        .getResourceConfig()
+        .getContainerRequestFilters()
+        .add(new ServerRequestTracingFilter
+        .Builder(tracer)
+        .withRequestSpanDecorator(new RequestSpanDecorator() {
+            public void decorate(ContainerRequest request, Span span) {
+                span.setTag("requestId", requestContext.getHeaderValue("X-Request-Id"));
+            }
+        })
+        .build());
+
 Trace Client Requests
 =====================
 
