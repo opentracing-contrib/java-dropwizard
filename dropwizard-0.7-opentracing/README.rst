@@ -15,7 +15,7 @@ Maven
     <dependency>
         <groupId>io.opentracing.contrib.dropwizard</groupId>
         <artifactId>dropwizard-0.7-opentracing</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.2</version>
     </dependency>
 
 Gradle
@@ -23,7 +23,7 @@ Gradle
 .. code-block::
 
     dependencies {
-        compile 'io.opentracing.contrib.dropwizard:dropwizard-0.7-opentracing:0.2.0'
+        compile 'io.opentracing.contrib.dropwizard:dropwizard-0.7-opentracing:0.2.2'
     }
 
 *****
