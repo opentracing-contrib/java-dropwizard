@@ -1,3 +1,7 @@
+**DEPRECATED** Please use `OpenTracing Java JAX-RS instrumentation`_
+
+.. _OpenTracing Java JAX-RS instrumentation: https://github.com/opentracing-contrib/java-jaxrs
+
 ######################
 DropWizard-OpenTracing
 ######################
